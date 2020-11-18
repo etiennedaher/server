@@ -50,6 +50,27 @@ app.get('/listEmployees', (req, res) => {
   })
 })
 
+app.delete('/deleteEmployee', (req, res) => {
+  let id=req.query.id
+  //TODO: validate Id
+
+  mongoose.connection.db.collection('employee', (error, collection) => {
+    collection.remove({_id: new mongoose.Types.ObjectId(id)}, (error, response) => {
+      if(error){
+        res.send({
+          result : false,
+          data : error.toString()
+        })
+      }else{
+        res.send({
+          result : true,
+          data : true
+        })
+      }
+    });
+  })
+})
+
 app.post('/addEmployee', (req, res) => {
   //TODO: validate record before proceeding
   let name=req.body.name
