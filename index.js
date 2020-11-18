@@ -32,6 +32,27 @@ app.get('/health', (req, res) => {
   })
 })
 
+app.get('/getEmployee', (req, res) => {
+  let id=req.query.id
+  //TODO: validate Id
+
+  mongoose.connection.db.collection('employee', (error, collection) => {
+    collection.findOne({_id: new mongoose.Types.ObjectId(id)}, (error, record) => {
+      if(error){
+        res.send({
+          result : false,
+          data : error.toString()
+        })
+      }else{
+        res.send({
+          result : true,
+          data : record
+        })
+      }
+    });
+  })
+})
+
 app.get('/listEmployees', (req, res) => {
   mongoose.connection.db.collection('employee', (error, collection) => {
     collection.find({}).sort({dateCreated : -1}).toArray((error, records) => {
@@ -88,10 +109,51 @@ app.post('/addEmployee', (req, res) => {
       jobTitle: jobTitle,
       department: department,
       location: location
-    }, function(err, response) {
-      console.log(err);
-      console.log("----");
-      console.log(response);
+    }, function(error, response) {
+      if(error){
+        res.send({
+          result : false,
+          data : error.toString()
+        })
+      }else{
+        res.send({
+          result : true,
+          data : true
+        })
+      }
+    })
+  })
+})
+
+app.put('/updateEmployee', (req, res) => {
+  //TODO: validate record before proceeding
+  let id=req.body.id
+  let name=req.body.name
+  let picture=req.body.picture
+  let jobTitle=req.body.jobTitle
+  let department=req.body.department
+  let location=req.body.location
+
+  mongoose.connection.db.collection('employee', (error, collection) => {
+    let employeeModel = mongoose.model('employee', employeeSchema, 'employee');
+    employeeModel.update({_id: new mongoose.Types.ObjectId(id)}, {
+      name: name,
+      picture: picture,
+      jobTitle: jobTitle,
+      department: department,
+      location: location
+    }, function(error, response) {
+      if(error){
+        res.send({
+          result : false,
+          data : error.toString()
+        })
+      }else{
+        res.send({
+          result : true,
+          data : true
+        })
+      }
     })
   })
 })
